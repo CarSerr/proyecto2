@@ -1,0 +1,48 @@
+name: Destroy Tienda Server
+
+on: 
+   workflow_dispatch:
+
+env:
+    AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    TF_VAR_TIENDA_TOKEN: ${{ secrets.TIENDA_TOKEN }}
+    TF_VAR_DB_NAME: ${{ secrets.DB_NAME }}
+    TF_VAR_DB_CLUSTER: ${{ secrets.DB_CLUSTER }}
+    TF_VAR_DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+    TF_VAR_DB_USER: ${{ secrets.DB_USER }}
+    TF_VAR_DOMAIN: ${{ secrets.DOMAIN }}
+    TF_VAR_USER_EMAIL: ${{ secrets.USER_EMAIL }}
+
+jobs:
+    terraform-apply:
+        runs-on: ubuntu-latest
+        steps: 
+           - name: Clone repository
+             uses: actions/checkout@v4
+
+           - name: Terraform setup
+             uses: hashicorp/setup-terraform@v2
+             with:
+                terraform_version: 1.9.8
+                terraform_wrapper: false
+
+           - name: Create SSH Keys from secrets
+             run: |
+               mkdir keys
+               echo "${{ secrets.SSH_PRIVATE_KEY }}" > ./keys/tiendaVideojuegos
+               echo "${{ secrets.SSH_PUBLIC_KEY }}" > ./keys/tiendaVideojuegos.pub
+               chmod 777 ./keys/tiendaVideojuegos
+               chmod 777 ./keys/tiendaVideojuegos.pub
+
+           - name: Terraform init
+             run: terraform init
+
+           - name: Terraform format
+             run: terraform fmt
+
+           - name: Terraform validate
+             run: terraform validate
+
+           - name: Terraform destroy
+             run: terraform destroy --auto-approve
