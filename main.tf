@@ -13,7 +13,7 @@ terraform {
     endpoints = {
       s3 = "https://sfo3.digitaloceanspaces.com"
     }
-    bucket = "tiendavideojuegos"
+    bucket = "proyecto000001"
     key = "terraform.tfstate"
     skip_credentials_validation = true
     skip_requesting_account_id = true
